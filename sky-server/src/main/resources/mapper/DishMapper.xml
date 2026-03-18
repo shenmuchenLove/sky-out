@@ -2,6 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.DishMapper">
+    <!--
+    修改菜品信息
+    功能：根据提供的菜品 ID，动态更新菜品表中的字段数据
+    参数说明：
+        - id: 菜品 ID（必填，用于 WHERE 条件）
+        - name: 菜品名称（可选，非空时更新）
+        - categoryId: 分类 ID（可选，非空时更新）
+        - price: 菜品价格（可选，非空时更新）
+        - image: 菜品图片路径（可选，非空时更新）
+        - description: 菜品描述（可选，非空时更新）
+        - status: 状态（可选，非空时更新，0-停售 1-起售）
+        - updateTime: 更新时间（可选，非空时更新）
+        - updateUser: 更新人 ID（可选，非空时更新）
+    返回值：无（受影响的行数由 MyBatis 自动处理）
+-->
     <update id="update" parameterType="com.sky.entity.Dish">
         update dish
         <set>
@@ -32,13 +47,35 @@
         </set>
         where id = #{id}
     </update>
-    <!--批量删除菜品-->
+
+    <!--
+        批量删除菜品
+        功能：根据菜品 ID 数组批量删除菜品记录
+        参数说明：
+            - array: 菜品 ID 数组（Long[] 类型）
+        返回值：无（受影响的行数由 MyBatis 自动处理）
+        SQL 特性：使用 foreach 遍历数组，生成 IN 条件语句
+    -->
     <delete id="delete">
         delete from dish where id in
         <foreach collection="array" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
+
+    <!--
+        菜品分页查询
+        功能：根据查询条件动态搜索菜品表，返回符合条件的菜品列表
+        参数说明：
+            - name: 菜品名称（可选，模糊匹配）
+            - categoryId: 分类 ID（可选，精确匹配）
+            - status: 状态（可选，精确匹配，0-停售 1-起售）
+            - page: 当前页码（由 PageHelper 插件处理）
+            - pageSize: 每页记录数（由 PageHelper 插件处理）
+        返回值：Dish 实体列表（包含完整的菜品信息及分类名称）
+        关联查询：LEFT JOIN 分类表获取分类名称
+        排序规则：按更新时间降序排列
+    -->
     <select id="pageQuery" resultType="com.sky.entity.Dish" parameterType="com.sky.dto.DishPageQueryDTO">
         select d.*, c.name as categoryName from dish d left join category c on d.category_id = c.id
         <where>

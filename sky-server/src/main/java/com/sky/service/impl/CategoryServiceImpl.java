@@ -3,10 +3,12 @@ package com.sky.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
+import com.sky.exception.CategoryBusinessException;
 import com.sky.mapper.CategoryMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealMapper;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -138,16 +141,35 @@ public class CategoryServiceImpl implements CategoryService {
      * 修改分类状态
      *
      * @param status 分类状态
-     * @param id     分类id
+     * @param id     分类 id
      */
     @Override
     public void setStatus(Integer status, Long id) {
+
+        // 如果要将分类设置为停售状态，需要先判断当前分类下是否有在售的菜品
+        if (Objects.equals(status, StatusConstant.DISABLE)) {
+            Integer count = dishMapper.countByCategoryId(id);
+            if (count > 0) {
+                // 当前分类下有菜品关联，停售失败
+                throw new RuntimeException("当前分类关联了菜品，无法停售");
+            }
+
+            // 查询当前分类下是否有在售的套餐
+            count = setmealMapper.countByCategoryId(id);
+            if (count > 0) {
+                // 当前分类下有套餐关联，停售失败
+                throw new RuntimeException("当前分类关联了套餐，无法停售");
+            }
+        }
+
+
         Category category = Category.builder()
                 .status(status)
                 .id(id)
                 .updateTime(LocalDateTime.now())
                 .updateUser(BaseContext.getCurrentId())
                 .build();
+
 
         categoryMapper.update(category);
     }

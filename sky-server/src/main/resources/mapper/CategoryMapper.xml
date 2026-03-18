@@ -2,7 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.CategoryMapper">
-    <!--修改分类-->
+    <!--
+    修改分类信息
+    功能：根据提供的分类 ID，动态更新分类表中的字段数据
+    参数说明：
+        - id: 分类 ID（必填，用于 WHERE 条件）
+        - name: 分类名称（可选，非空时更新）
+        - sort: 排序值（可选，非空时更新）
+        - status: 状态（可选，非空时更新，0-停用 1-启用）
+        - type: 类型（可选，非空时更新，1-菜品分类 2-套餐分类）
+        - updateTime: 更新时间（可选，非空时更新）
+        - updateUser: 更新人 ID（可选，非空时更新）
+    返回值：无（受影响的行数由 MyBatis 自动处理）
+-->
     <update id="update" parameterType="com.sky.entity.Category">
         update category
         <set>
@@ -27,7 +39,18 @@
         </set>
         where id = #{id}
     </update>
-    <!--分页条件查询-->
+
+    <!--
+        分页条件查询分类
+        功能：根据查询条件动态搜索分类表，返回符合条件的分类列表
+        参数说明：
+            - name: 分类名称（可选，模糊匹配）
+            - type: 分类类型（可选，精确匹配，1-菜品分类 2-套餐分类）
+            - page: 当前页码（由 PageHelper 插件处理）
+            - pageSize: 每页记录数（由 PageHelper 插件处理）
+        返回值：Category 实体列表（包含完整的分类信息）
+        排序规则：按 sort 字段升序排列
+    -->
     <select id="page" resultType="com.sky.entity.Category" parameterType="com.sky.dto.CategoryPageQueryDTO">
         select id,
         type,

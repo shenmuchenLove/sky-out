@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Api(tags = "菜品管理接口")
 @Slf4j
@@ -105,5 +106,19 @@ public class DishController {
         log.info("修改菜品：{}", dto);
         dishService.update(dto);
         return Result.success();
+    }
+
+
+    /**
+     * 根据分类id查询菜品
+     *
+     * @param categoryId 分类id
+     */
+    @ApiOperation("根据分类id查询菜品")
+    @GetMapping("/list")
+    public Result< List<DishVO>> list(Integer categoryId) {
+        log.info("根据分类id查询菜品：{}", categoryId);
+        List<DishVO> dishVO = dishService.list(categoryId);
+        return Result.success(dishVO);
     }
 }

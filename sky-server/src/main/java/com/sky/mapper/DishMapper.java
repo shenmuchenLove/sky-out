@@ -5,6 +5,7 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface DishMapper {
      *
      * @param categoryId 分类id
      */
-    @Select("select count(*) from dish where category_id = #{categoryId}")
+    @Select("select count(*) from dish where category_id = #{categoryId} and status = 1")
     Integer countByCategoryId(Long categoryId);
 
     /**
@@ -70,4 +71,12 @@ public interface DishMapper {
      */
     @Select("select * from dish_flavor where dish_id = #{id}")
     List<DishFlavor> getByDishId(Long id);
+
+    /**
+     * 根据分类id查询菜品选项
+     *
+     * @param categoryId 分类id
+     */
+    @Select("select id, name, price, status from dish where category_id = #{categoryId}")
+    List<DishVO> getByCategoryId(Integer categoryId);
 }
