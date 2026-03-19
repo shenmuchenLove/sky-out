@@ -44,9 +44,18 @@ sky:
     admin-ttl: 7200000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    user-secret-key: ShenMuChen
+    user-ttl: 7200000
+    user-token-name: authentication
 
+  # 阿里云配置
   aly:
     oss:
       endpoint: https://oss-cn-beijing.aliyuncs.com
       bucket-name: muchen-sky
       region: cn-beijing
+
+  # 微信小程序配种
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
